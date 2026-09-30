@@ -241,3 +241,84 @@ const std::vector<DatSan>& QuanLyDatSan::getDanhSach() const
 {
     return danhSachDatSan;
 }
+
+// ===========================================================================
+// PRICING (Phase 5)
+// ===========================================================================
+
+namespace
+{
+    // Pricing period table (all times in minutes from midnight)
+    struct KhoangGia
+    {
+        int    batDau; // inclusive
+        int    ketThuc; // exclusive
+        double giaPerHour;
+    };
+
+    // 00:00–06:00: 100,000   (early morning, same rate as daytime)
+    // 06:00–16:00: 100,000   (daytime)
+    // 16:00–22:00: 150,000   (peak evening)
+    // 22:00–24:00: 100,000   (late night)
+    static const KhoangGia BANG_GIA[] = {
+        {    0,  360, 100000.0},
+        {  360,  960, 100000.0},
+        {  960, 1320, 150000.0},
+        { 1320, 1440, 100000.0},
+    };
+    static const int SO_KHOANG = static_cast<int>(sizeof(BANG_GIA) / sizeof(BANG_GIA[0]));
+} // anonymous namespace
+
+// ---------------------------------------------------------------------------
+// tinhTienTheoGio (static)
+// ---------------------------------------------------------------------------
+double QuanLyDatSan::tinhTienTheoGio(const std::string& gioBatDau,
+                                      const std::string& gioKetThuc)
+{
+    if (!BoDatSan::khoangGioHopLe(gioBatDau, gioKetThuc))
+        return -1.0;
+
+    int start = BoDatSan::phanTichGio(gioBatDau); // minutes
+    int end   = BoDatSan::phanTichGio(gioKetThuc);
+
+    double tong = 0.0;
+    for (int i = 0; i < SO_KHOANG; ++i)
+    {
+        int overlapStart = std::max(start, BANG_GIA[i].batDau);
+        int overlapEnd   = std::min(end,   BANG_GIA[i].ketThuc);
+        if (overlapEnd > overlapStart)
+        {
+            double soPhut = static_cast<double>(overlapEnd - overlapStart);
+            tong += (soPhut / 60.0) * BANG_GIA[i].giaPerHour;
+        }
+    }
+    return tong;
+}
+
+// ---------------------------------------------------------------------------
+// tinhTienDatSan
+// ---------------------------------------------------------------------------
+double QuanLyDatSan::tinhTienDatSan(const DatSan& datSan) const
+{
+    if (datSan.getTrangThai() == "CANCELLED")
+        return -1.0;
+
+    return tinhTienTheoGio(datSan.getGioBatDau(), datSan.getGioKetThuc());
+}
+
+// ---------------------------------------------------------------------------
+// apDungTienDatSan
+// ---------------------------------------------------------------------------
+bool QuanLyDatSan::apDungTienDatSan(int id)
+{
+    DatSan* ds = timTheoId(id);
+    if (ds == nullptr)
+        return false;
+
+    double tien = tinhTienDatSan(*ds);
+    if (tien < 0.0)
+        return false; // CANCELLED or invalid times
+
+    ds->setTongTien(tien);
+    return true;
+}

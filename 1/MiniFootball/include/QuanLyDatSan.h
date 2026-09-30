@@ -7,7 +7,7 @@
 #include "QuanLyKhachHang.h"
 
 /**
- * QuanLyDatSan — Phase 4 (Booking Logic)
+ * QuanLyDatSan — Phase 4 + 5 (Booking Logic & Pricing)
  *
  * Manages the booking collection with full validation:
  *  - date/time format and logical correctness
@@ -119,4 +119,39 @@ public:
                          int ngoaiTruId = -1) const;
 
     const std::vector<DatSan>& getDanhSach() const;
+
+    // -----------------------------------------------------------------
+    // PRICING (Phase 5)
+    // -----------------------------------------------------------------
+
+    /**
+     * tinhTienTheoGio — calculate raw rental cost for a time interval.
+     *
+     * Pricing schedule (applies to all fields):
+     *   00:00–06:00  100,000 VND/hour
+     *   06:00–16:00  100,000 VND/hour
+     *   16:00–22:00  150,000 VND/hour
+     *   22:00–24:00  100,000 VND/hour
+     *
+     * Splits the interval across pricing boundaries and sums each segment.
+     * Supports minute precision (e.g. 15:30–17:30).
+     *
+     * Returns -1.0 if the time interval is invalid.
+     */
+    static double tinhTienTheoGio(const std::string& gioBatDau,
+                                   const std::string& gioKetThuc);
+
+    /**
+     * tinhTienDatSan — calculate the rental cost for a given booking.
+     * Returns -1.0 if the booking is CANCELLED or the times are invalid.
+     * Does NOT modify the booking object.
+     */
+    double tinhTienDatSan(const DatSan& datSan) const;
+
+    /**
+     * apDungTienDatSan — calculate cost and write it into DatSan.tongTien.
+     * Finds the booking by id, calculates, and calls setTongTien.
+     * Returns false if the booking is not found or is CANCELLED.
+     */
+    bool apDungTienDatSan(int id);
 };
