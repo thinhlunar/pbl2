@@ -24,6 +24,7 @@ add_executable(MiniFootball
     src/QuanLyDatSan.cpp
     src/QuanLyDichVu.cpp
     src/QuanLyHoaDon.cpp
+    src/BoDatSan.cpp
 )
 
 target_include_directories(MiniFootball PRIVATE
