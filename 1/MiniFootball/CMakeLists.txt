@@ -18,6 +18,12 @@ add_executable(MiniFootball
     src/DichVu.cpp
     src/ChiTietDichVu.cpp
     src/HoaDon.cpp
+    src/QuanLyTaiKhoan.cpp
+    src/QuanLyKhachHang.cpp
+    src/QuanLySan.cpp
+    src/QuanLyDatSan.cpp
+    src/QuanLyDichVu.cpp
+    src/QuanLyHoaDon.cpp
 )
 
 target_include_directories(MiniFootball PRIVATE
