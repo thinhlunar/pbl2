@@ -59,6 +59,11 @@ void HoaDon::setTienSan(double tienSan)
     this->tienSan = tienSan;
 }
 
+void HoaDon::setTienDichVu(double tienDichVu)
+{
+    this->tienDichVu = tienDichVu;
+}
+
 void HoaDon::setNgayThanhToan(const std::string& ngayThanhToan)
 {
     this->ngayThanhToan = ngayThanhToan;

@@ -38,6 +38,7 @@ public:
 
     // Setters (id, maDatSan must NOT have setters)
     void setTienSan(double tienSan);
+    void setTienDichVu(double tienDichVu);
     void setNgayThanhToan(const std::string& ngayThanhToan);
     void setTrangThai(const std::string& trangThai);
 

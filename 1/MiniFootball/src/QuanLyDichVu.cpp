@@ -3,11 +3,30 @@
 #include <algorithm>
 #include <iostream>
 
-void QuanLyDichVu::themDichVu(const DichVu& dichVu)
+// ---------------------------------------------------------------------------
+// themDichVu — validated add
+// ---------------------------------------------------------------------------
+bool QuanLyDichVu::themDichVu(const DichVu& dichVu)
 {
+    // ID uniqueness
+    if (timTheoId(dichVu.getId()) != nullptr)
+        return false;
+
+    // Name must not be empty
+    if (dichVu.getTenDichVu().empty())
+        return false;
+
+    // Price must be non-negative
+    if (dichVu.getDonGia() < 0.0)
+        return false;
+
     danhSachDichVu.push_back(dichVu);
+    return true;
 }
 
+// ---------------------------------------------------------------------------
+// xoaDichVu
+// ---------------------------------------------------------------------------
 bool QuanLyDichVu::xoaDichVu(int id)
 {
     auto it = std::find_if(
@@ -21,6 +40,9 @@ bool QuanLyDichVu::xoaDichVu(int id)
     return true;
 }
 
+// ---------------------------------------------------------------------------
+// suaDichVu — validated update
+// ---------------------------------------------------------------------------
 bool QuanLyDichVu::suaDichVu(int id,
                                const std::string& tenDichVu,
                                double donGia)
@@ -29,11 +51,20 @@ bool QuanLyDichVu::suaDichVu(int id,
     if (dv == nullptr)
         return false;
 
+    if (tenDichVu.empty())
+        return false;
+
+    if (donGia < 0.0)
+        return false;
+
     dv->setTenDichVu(tenDichVu);
     dv->setDonGia(donGia);
     return true;
 }
 
+// ---------------------------------------------------------------------------
+// Lookups
+// ---------------------------------------------------------------------------
 DichVu* QuanLyDichVu::timTheoId(int id)
 {
     for (DichVu& dv : danhSachDichVu)
@@ -66,14 +97,17 @@ const DichVu* QuanLyDichVu::timTheoTen(const std::string& tenDichVu) const
     return nullptr;
 }
 
+// ---------------------------------------------------------------------------
+// hienThiDanhSach
+// ---------------------------------------------------------------------------
 void QuanLyDichVu::hienThiDanhSach() const
 {
     std::cout << "=== DANH SACH DICH VU ===\n";
     for (const DichVu& dv : danhSachDichVu)
     {
-        std::cout << "ID: "         << dv.getId()
-                  << " | Ten: "      << dv.getTenDichVu()
-                  << " | Don gia: "  << dv.getDonGia()
+        std::cout << "ID: "        << dv.getId()
+                  << " | Ten: "     << dv.getTenDichVu()
+                  << " | Don gia: " << dv.getDonGia()
                   << "\n";
     }
 }
